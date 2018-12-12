@@ -5,13 +5,22 @@ from django.utils import timezone
 # Create your models here.
 class Vendedores(models.Model):
     nome = models.CharField(max_length=20)
+    email = models.EmailField()
+    fone = models.CharField(max_length=12)
 
     def __str__(self):
-        return self.nome
+        return 'Nome: ' + self.nome + ' - E-mail: ' + self.email + ' - Fone: ' + self.fone
 
 
 class Pessoa(models.Model):
     nome_cliente = models.CharField(max_length=30)
+    endereco = models.CharField(max_length=50)
+    email = models.EmailField()
+    fone = models.CharField(max_length=12)
+    vendedor = models.ForeignKey(Vendedores, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return 'Cliente: ' + self.nome_cliente + ' - vendedor: ' + self.vendedor.nome + ' - Fone: ' + self.fone
 
 class Atendimento(models.Model):
     SITUACAO_CHOICES = (
@@ -24,7 +33,7 @@ class Atendimento(models.Model):
                                    verbose_name='Observações', help_text='500 caracteres no máximo')
 
     def __str__(self):
-        return self.situacao + ' - ' + self.cliente.nome_cliente
+        return 'Cliente: ' + self.cliente.nome_cliente + ' - Status: ' + self.situacao
 
 
 class Visita(models.Model):
@@ -34,3 +43,5 @@ class Visita(models.Model):
     observacoes = models.TextField(max_length=500, verbose_name="Observações",
                                    blank=True, null=True, help_text='500 caracteres no máximo')
 
+    def __str__(self):
+        return "Data: %s - Cliente: %s - Vendedor: %s" % (self.data, self.atendimento.cliente.nome_cliente, self.atendimento.cliente.vendedor.nome)
